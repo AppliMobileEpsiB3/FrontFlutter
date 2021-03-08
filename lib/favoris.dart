@@ -1,8 +1,46 @@
+import 'dart:convert';
+import 'package:lapinte/liste.dart';
+
+import 'globals.dart' as globals;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lapinte/main.dart';
 import 'package:lapinte/detailBiere.dart';
-import 'package:lapinte/liste.dart';
 import 'package:lapinte/search.dart';
+import 'package:http/http.dart' as http;
+import 'globals.dart' as globals;
+
+Future<List<Biere>> fetchBeers(http.Client client) async {
+  final response = await client
+      .get('http://10.0.2.2:5000/favorite/' + globals.user_id.toString());
+
+  // Use the compute function to run parseBieres in a separate isolate.
+  return compute(parseBieres, response.body);
+}
+
+List<Biere> parseBieres(String responseBody) {
+  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
+
+  return parsed.map<Biere>((json) => Biere.fromJson(json)).toList();
+}
+
+class Biere {
+  final int id;
+  final String name;
+  final String percentageAlcohol;
+  final String category;
+
+  Biere({this.id, this.name, this.percentageAlcohol, this.category});
+
+  factory Biere.fromJson(Map<String, dynamic> json) {
+    return Biere(
+      id: json['id'] as int,
+      name: json['name'] as String,
+      percentageAlcohol: json['percentageAlcohol'] as String,
+      category: json['category'] as String,
+    );
+  }
+}
 
 void main() {
   runApp(Favoris());
@@ -30,7 +68,7 @@ class Favoris extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Mes favoris !'),
+      home: MyHomePage(title: 'Liste des binouses !'),
     );
   }
 }
@@ -54,8 +92,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final items = List<String>.generate(30, (i) => "Binouze n° $i");
-
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -71,14 +107,14 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-              title: Text('${items[index]}'),
-              onTap: () {
-                runApp(Detail());
-              });
+      body: FutureBuilder<List<Biere>>(
+        future: fetchBeers(http.Client()),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) print(snapshot.error);
+
+          return snapshot.hasData
+              ? BieresList(bieres: snapshot.data)
+              : Center(child: CircularProgressIndicator());
         },
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -104,17 +140,44 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
         onTap: (int index) {
-          if (index == 0) {
-            runApp(Liste());
-          }
           if (index == 1) {
             runApp(Search());
+          }
+          if (index == 0) {
+            runApp(Liste());
           }
           if (index == 3) {
             runApp(Auth());
           }
         },
       ),
+    );
+  }
+}
+
+class BieresList extends StatelessWidget {
+  final List<Biere> bieres;
+
+  BieresList({Key key, this.bieres}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+      ),
+      itemCount: bieres.length,
+      itemBuilder: (context, index) {
+        return ListTile(
+          title: Text(bieres[index].name),
+          onTap: () {
+            globals.beerIndex = bieres[index].id;
+            globals.nameBeer = bieres[index].name;
+            print(bieres[index].id);
+            runApp(Detail());
+          },
+        );
+      },
     );
   }
 }

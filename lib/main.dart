@@ -57,12 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final passwordCtrlr = TextEditingController();
 
   bool isExist(TextEditingController pseudo, TextEditingController password) {
-    //final test = http.get('https://jsonplaceholder.typicode.com/albums/1');
-
-    //debugPrint(pseudoCtrlr.text);
-    //debugPrint(passwordCtrlr.text);
-
-    if (pseudoCtrlr.text == "toto" && passwordCtrlr.text == "titi") {
+    if (pseudoCtrlr.text == "deux" && passwordCtrlr.text == "titi") {
       globals.userName = pseudoCtrlr.text;
       return true;
     }
