@@ -21,6 +21,20 @@ List<Biere> parseBieres(String responseBody) {
   return parsed.map<Biere>((json) => Biere.fromJson(json)).toList();
 }
 
+Future<String> _isInFavoris() async {
+  // Récupération de la localisation actuelle de l'utilisateur
+  // Construction de l'URL a appeler
+  var url = 'http://10.0.2.2:5000/favorite/' + globals.user_id.toString();
+  // Appel
+  var response = await http.get(url);
+  print('Response status: ${response.statusCode}');
+  print('Response body: ${response.body}');
+  globals.isfav = response.body.contains(globals.nameBeer);
+
+  print('favori run');
+  return response.body;
+}
+
 class Biere {
   final int id;
   final String name;
@@ -167,10 +181,13 @@ class BieresList extends StatelessWidget {
       itemBuilder: (context, index) {
         return ListTile(
           title: Text(bieres[index].name),
-          onTap: () {
+          onTap: () async {
             globals.beerIndex = bieres[index].id;
             globals.nameBeer = bieres[index].name;
             print(bieres[index].id);
+            await _isInFavoris();
+            print(globals.isfav.toString());
+            print('-------');
             runApp(Detail());
           },
         );

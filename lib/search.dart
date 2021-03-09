@@ -29,7 +29,7 @@ class Search extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Rechercher'),
+      home: MyHomePage(title: 'Rechercher --nonFonctionel(manque de temps)--'),
     );
   }
 }

@@ -15,6 +15,9 @@ class Detail extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    print(globals.nameBeer.toString());
+    print(globals.isfav.toString());
+
     return MaterialApp(
       title: 'La Pinte',
       theme: ThemeData(
@@ -57,12 +60,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final items = List<String>.generate(30, (i) => "Binouse n° $i");
-  var ajout = true;
-  isFavoris() {
-    return ajout;
-  }
-
   /*Future<String> _ajoutFav() async {
     // Récupération de la localisation actuelle de l'utilisateur
     // Construction de l'URL a appeler
@@ -74,9 +71,13 @@ class _MyHomePageState extends State<MyHomePage> {
     print('Response body: ${response.body}');
     return response.body;
   }*/
-  Map data = {'beer_id': globals.beerIndex.toString(), 'user_id': "2"};
 
   Future<String> _ajoutFav() async {
+    Map data = {
+      'beer_id': globals.beerIndex.toString(),
+      'user_id': globals.user_id.toString()
+    };
+
     String body = json.encode(data);
     var url = 'http://10.0.2.2:5000/favorite';
     http.Response response = await http.post(
@@ -87,6 +88,17 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<String> _supFav() async {
+    var url = 'http://10.0.2.2:5000/favorite/' +
+        globals.beerIndex.toString() +
+        '/' +
+        globals.user_id.toString();
+    http.Response response = await http.delete(
+      url,
+      headers: {"Content-Type": "application/json"},
+    );
+  }
+
+  Future<String> _supav() async {
     /*final baseUrl = "http://10.0.2.2:5000/favorite";
     final url = Uri.parse(baseUrl);
     final request = http.Request("DELETE", url);
@@ -111,7 +123,6 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-
     var flatButton = FlatButton(
       color: Colors.orange,
       textColor: Colors.white,
@@ -121,23 +132,24 @@ class _MyHomePageState extends State<MyHomePage> {
       splashColor: Colors.orangeAccent,
       onPressed: () {
         setState(() {
-          if (ajout == true) {
+          if (globals.isfav == false) {
             _ajoutFav();
           } else {
             _supFav();
           }
-          ajout = !ajout;
+          globals.isfav = !globals.isfav;
         });
+
         /* Requete API pour ajouter/enlever à la table favoris  */
       },
       //Faire un if en fonction de si il est dans les favoris bouton enlever et si pas presenter bouton ajouter
-      child: isFavoris()
+      child: globals.isfav
           ? Text(
-              "Ajouter à mes favoris",
+              "Supprimer de mes favoris",
               style: TextStyle(fontSize: 15.0),
             )
           : Text(
-              "Supprimer de mes favoris",
+              "Ajouter à mes favoris",
               style: TextStyle(fontSize: 15.0),
             ),
     );

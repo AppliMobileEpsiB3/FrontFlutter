@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'globals.dart' as globals;
 import 'package:lapinte/liste.dart';
@@ -56,15 +58,31 @@ class _MyHomePageState extends State<MyHomePage> {
   final pseudoCtrlr = TextEditingController();
   final passwordCtrlr = TextEditingController();
 
-  bool isExist(TextEditingController pseudo, TextEditingController password) {
-    if (pseudoCtrlr.text == "deux" && passwordCtrlr.text == "titi") {
-      globals.userName = pseudoCtrlr.text;
+  /*bool isExist(TextEditingController pseudo, TextEditingController password) {
+    if (pseudoCtrlr.text == "test" && passwordCtrlr.text == "titi") {
+      
       return true;
     }
     return false;
+  }*/
+
+  Future<String> _authentification() async {
+    Map data = {'pseudo': pseudoCtrlr.text, 'password': passwordCtrlr.text};
+    globals.userName = pseudoCtrlr.text;
+    globals.isfav = true;
+    String body = json.encode(data);
+    var url = 'http://10.0.2.2:5001/login';
+    http.Response response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: body,
+    );
+    globals.statuscode = response.statusCode;
+    globals.token = response.body;
+    //print(response.statusCode.toString());
   }
 
-  Future<String> _getAuth() async {
+  /*Future<String> _getAuth() async {
     // Récupération de la localisation actuelle de l'utilisateur
     // Construction de l'URL a appeler
     var url = 'http://10.0.2.2:5000/beers';
@@ -74,7 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
     print('Response body: ${response.body}');
     debugPrint(response.body);
     return response.body;
-  }
+  }*/
 
   Future<String> sunriseSunsetTimes;
 
@@ -143,9 +161,9 @@ class _MyHomePageState extends State<MyHomePage> {
               disabledTextColor: Colors.black,
               padding: EdgeInsets.all(9.0),
               splashColor: Colors.orangeAccent,
-              onPressed: () {
-                if (isExist(pseudoCtrlr, passwordCtrlr)) {
-                  _getAuth();
+              onPressed: () async {
+                await _authentification();
+                if (globals.statuscode == 200) {
                   runApp(Liste());
                 } else {
                   return showDialog(
