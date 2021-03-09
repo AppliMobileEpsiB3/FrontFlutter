@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:lapinte/liste.dart';
-
 import 'globals.dart' as globals;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,10 +10,10 @@ import 'package:http/http.dart' as http;
 import 'globals.dart' as globals;
 
 Future<List<Biere>> fetchBeers(http.Client client) async {
-  final response = await client
-      .get('http://10.0.2.2:5000/favorite/' + globals.user_id.toString());
+  final response = await client.get(
+      'http://10.0.2.2:5000/favorite/' + globals.user_id.toString(),
+      headers: {"Content-Type": "application/json", "token": globals.token});
 
-  // Use the compute function to run parseBieres in a separate isolate.
   return compute(parseBieres, response.body);
 }
 

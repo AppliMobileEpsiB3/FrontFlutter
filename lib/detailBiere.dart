@@ -82,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
     var url = 'http://10.0.2.2:5000/favorite';
     http.Response response = await http.post(
       url,
-      headers: {"Content-Type": "application/json"},
+      headers: {"Content-Type": "application/json", "token": globals.token},
       body: body,
     );
   }
@@ -94,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
         globals.user_id.toString();
     http.Response response = await http.delete(
       url,
-      headers: {"Content-Type": "application/json"},
+      headers: {"Content-Type": "application/json", "token": globals.token},
     );
   }
 
@@ -123,6 +123,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+
     var flatButton = FlatButton(
       color: Colors.orange,
       textColor: Colors.white,

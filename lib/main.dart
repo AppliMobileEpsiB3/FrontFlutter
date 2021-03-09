@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'globals.dart' as globals;
 import 'package:lapinte/liste.dart';
@@ -16,19 +15,7 @@ class Auth extends StatelessWidget {
     return MaterialApp(
       title: 'La Pinte',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.yellow,
-        // This makes the visual density adapt to the platform that you run
-        // the app on. For desktop platforms, the controls will be smaller and
-        // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: MyHomePage(title: 'Authentification'),
@@ -38,15 +25,6 @@ class Auth extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   final String title;
 
@@ -58,13 +36,25 @@ class _MyHomePageState extends State<MyHomePage> {
   final pseudoCtrlr = TextEditingController();
   final passwordCtrlr = TextEditingController();
 
-  /*bool isExist(TextEditingController pseudo, TextEditingController password) {
-    if (pseudoCtrlr.text == "test" && passwordCtrlr.text == "titi") {
-      
-      return true;
+  String decodeBase64(String str) {
+    //'-', '+' 62nd char of encoding,  '_', '/' 63rd char of encoding
+    String output = str.replaceAll('-', '+').replaceAll('_', '/');
+    switch (output.length % 4) {
+      // Pad with trailing '='
+      case 0: // No pad chars in this case
+        break;
+      case 2: // Two pad chars
+        output += '==';
+        break;
+      case 3: // One pad char
+        output += '=';
+        break;
+      default:
+        throw Exception('Illegal base64url string!"');
     }
-    return false;
-  }*/
+
+    return utf8.decode(base64Url.decode(output));
+  }
 
   Future<String> _authentification() async {
     Map data = {'pseudo': pseudoCtrlr.text, 'password': passwordCtrlr.text};
@@ -77,22 +67,22 @@ class _MyHomePageState extends State<MyHomePage> {
       headers: {"Content-Type": "application/json"},
       body: body,
     );
+    //var test = json.decodeBase64(response.body);
     globals.statuscode = response.statusCode;
-    globals.token = response.body;
-    //print(response.statusCode.toString());
-  }
 
-  /*Future<String> _getAuth() async {
-    // Récupération de la localisation actuelle de l'utilisateur
-    // Construction de l'URL a appeler
-    var url = 'http://10.0.2.2:5000/beers';
-    // Appel
-    var response = await http.get(url);
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
-    debugPrint(response.body);
-    return response.body;
-  }*/
+    if (response.statusCode == 200) {
+      final parts = response.body.split('.');
+      if (parts.length != 3) {
+        throw Exception('invalid token');
+      }
+
+      final payload = decodeBase64(parts[1]);
+      final payloadMap = json.decode(payload);
+
+      globals.user_id = payloadMap['user_id'];
+      globals.token = response.body;
+    }
+  }
 
   Future<String> sunriseSunsetTimes;
 
@@ -114,21 +104,6 @@ class _MyHomePageState extends State<MyHomePage> {
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-
           children: <Widget>[
             Padding(
                 padding: EdgeInsets.fromLTRB(20, 30, 20, 20),

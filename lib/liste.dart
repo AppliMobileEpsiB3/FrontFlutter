@@ -9,7 +9,8 @@ import 'package:lapinte/search.dart';
 import 'package:http/http.dart' as http;
 
 Future<List<Biere>> fetchBeers(http.Client client) async {
-  final response = await client.get('http://10.0.2.2:5000/beers');
+  final response = await client.get('http://10.0.2.2:5000/beers',
+      headers: {"Content-Type": "application/json", "token": globals.token});
 
   // Use the compute function to run parseBieres in a separate isolate.
   return compute(parseBieres, response.body);
@@ -26,12 +27,12 @@ Future<String> _isInFavoris() async {
   // Construction de l'URL a appeler
   var url = 'http://10.0.2.2:5000/favorite/' + globals.user_id.toString();
   // Appel
-  var response = await http.get(url);
-  print('Response status: ${response.statusCode}');
-  print('Response body: ${response.body}');
+  var response = await http.get(url,
+      headers: {"Content-Type": "application/json", "token": globals.token});
+  //print('Response status: ${response.statusCode}');
+  //print('Response body: ${response.body}');
   globals.isfav = response.body.contains(globals.nameBeer);
 
-  print('favori run');
   return response.body;
 }
 
@@ -184,10 +185,9 @@ class BieresList extends StatelessWidget {
           onTap: () async {
             globals.beerIndex = bieres[index].id;
             globals.nameBeer = bieres[index].name;
-            print(bieres[index].id);
+
             await _isInFavoris();
-            print(globals.isfav.toString());
-            print('-------');
+
             runApp(Detail());
           },
         );
