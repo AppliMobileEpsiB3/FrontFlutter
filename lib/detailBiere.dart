@@ -160,6 +160,26 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(globals.nameBeer),
       ),
+      body: Padding(
+        padding: EdgeInsets.fromLTRB(20, 30, 20, 20),
+        child: Column(children: <Widget>[
+          TextField(
+            decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: 'Degré d \'alcool : ' + globals.percentageAlcohol),
+          ),
+          TextField(
+            decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: 'Couleur : ' + globals.category),
+          ),
+        ]),
+        /*  TextField(
+        decoration: InputDecoration(
+            border: InputBorder.none,
+            hintText: 'Degré d \'alcool : ' + globals.percentageAlcohol),
+      ),*/
+      ),
       floatingActionButton: flatButton,
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,

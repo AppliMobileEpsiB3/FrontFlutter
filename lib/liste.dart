@@ -13,6 +13,8 @@ Future<List<Biere>> fetchBeers(http.Client client) async {
       headers: {"Content-Type": "application/json", "token": globals.token});
 
   // Use the compute function to run parseBieres in a separate isolate.
+  //print('Response body: ${response.body}');
+
   return compute(parseBieres, response.body);
 }
 
@@ -185,7 +187,8 @@ class BieresList extends StatelessWidget {
           onTap: () async {
             globals.beerIndex = bieres[index].id;
             globals.nameBeer = bieres[index].name;
-
+            globals.category = bieres[index].category;
+            globals.percentageAlcohol = bieres[index].percentageAlcohol;
             await _isInFavoris();
 
             runApp(Detail());

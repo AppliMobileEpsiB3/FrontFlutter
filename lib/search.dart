@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:lapinte/favoris.dart';
 import 'package:lapinte/liste.dart';
+import 'package:flutter/foundation.dart';
+
 import 'package:lapinte/main.dart';
+import 'package:http/http.dart' as http;
+import 'globals.dart' as globals;
+import 'dart:convert';
 
 void main() {
   runApp(Search());
@@ -29,7 +34,7 @@ class Search extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Rechercher --nonFonctionel(manque de temps)--'),
+      home: MyHomePage(title: 'Ajouter une mousse'),
     );
   }
 }
@@ -52,8 +57,82 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+class Biere {
+  final int id;
+  final String name;
+  final String percentageAlcohol;
+  final String category;
+
+  Biere({this.id, this.name, this.percentageAlcohol, this.category});
+
+  factory Biere.fromJson(Map<String, dynamic> json) {
+    return Biere(
+      id: json['id'] as int,
+      name: json['name'] as String,
+      percentageAlcohol: json['percentageAlcohol'] as String,
+      category: json['category'] as String,
+    );
+  }
+}
+
+Future<List<Biere>> fetchBeers(http.Client client) async {
+  final response = await client.get('http://10.0.2.2:5000/beers',
+      headers: {"Content-Type": "application/json", "token": globals.token});
+
+  // Use the compute function to run parseBieres in a separate isolate.
+  // print('Response body: ${response.body}');
+  //print('----');
+  //print(compute(parseBieres, response.body).toString());
+  return compute(parseBieres, response.body);
+}
+
+List<Biere> parseBieres(String responseBody) {
+  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
+  return parsed.map<Biere>((json) => Biere.fromJson(json)).toList();
+}
+
 class _MyHomePageState extends State<MyHomePage> {
-  final searchCtrlr = TextEditingController();
+  final nomCtrl = TextEditingController();
+  final couleurCtrl = TextEditingController();
+  final degreCtrl = TextEditingController();
+
+  Future<String> _ajoutBeer(List<Biere> bieres) async {
+    globals.isHere = false;
+
+    bieres.forEach((biere) => {
+          if (biere.name == nomCtrl.text && biere.category == couleurCtrl.text)
+            {globals.isHere = true}
+        });
+    Map data = {
+      'name': nomCtrl.text.toString(),
+      'percentageAlcohol': degreCtrl.text.toString(),
+      'category': couleurCtrl.text.toString()
+    };
+
+    if (globals.isHere) {
+      String body = json.encode(data);
+      var url = 'http://10.0.2.2:5000/beers';
+      http.Response response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json", "token": globals.token},
+        body: body,
+      );
+    }
+  }
+
+  /*Future<String> _isHere(List<Biere> bieres) async {
+    // Récupération de la localisation actuelle de l'utilisateur
+    // Construction de l'URL a appeler
+    var url = 'http://10.0.2.2:5000/beers/';
+    // Appel
+    var response = await http.get(url,
+        headers: {"Content-Type": "application/json", "token": globals.token});
+    //print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+    globals.isHere = response.body.contains(nomCtrl.text);
+
+    return response.body;
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -69,12 +148,69 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: TextField(
-        decoration: InputDecoration(
-          border: OutlineInputBorder(),
-          labelText: 'Nom de biere',
-        ),
-        controller: searchCtrlr,
+      body: Padding(
+        padding: EdgeInsets.fromLTRB(20, 30, 20, 20),
+        child: Column(children: <Widget>[
+          TextField(
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Nom',
+            ),
+            controller: nomCtrl,
+          ),
+          TextField(
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Couleur',
+            ),
+            controller: couleurCtrl,
+          ),
+          TextField(
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Degré',
+            ),
+            controller: degreCtrl,
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(0, 4, 0, 0),
+          ),
+          FlatButton(
+            color: Colors.orange,
+            textColor: Colors.white,
+            disabledColor: Colors.grey,
+            disabledTextColor: Colors.black,
+            padding: EdgeInsets.all(9.0),
+            splashColor: Colors.orangeAccent,
+            onPressed: () async {
+              //await fetchBeers(http.Client());
+              List<Biere> listeBeers = await fetchBeers(http.Client());
+              await _ajoutBeer(listeBeers);
+              if (globals.isHere == false) {
+                return showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      content: Text("Biere ajouter à la liste"),
+                    );
+                  },
+                );
+              }
+              return showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    content: Text("Biere déjà existante"),
+                  );
+                },
+              );
+            },
+            child: Text(
+              "Ajouter",
+              style: TextStyle(fontSize: 20.0),
+            ),
+          ),
+        ]),
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
