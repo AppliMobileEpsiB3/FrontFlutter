@@ -9,10 +9,10 @@ import 'globals.dart' as globals;
 import 'dart:convert';
 
 void main() {
-  runApp(Search());
+  runApp(Ajout());
 }
 
-class Search extends StatelessWidget {
+class Ajout extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -222,8 +222,8 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: Icon(Icons.list_alt_sharp),
           ),
           BottomNavigationBarItem(
-            title: Text("Recherche"),
-            icon: Icon(Icons.search),
+            title: Text("Ajouter"),
+            icon: Icon(Icons.add_circle_outline),
           ),
           BottomNavigationBarItem(
             title: Text("Mes favoris"),

@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lapinte/main.dart';
 import 'package:lapinte/detailBiere.dart';
-import 'package:lapinte/search.dart';
+import 'package:lapinte/ajouter.dart';
 import 'package:http/http.dart' as http;
 import 'globals.dart' as globals;
 
@@ -126,8 +126,8 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: Icon(Icons.list_alt_sharp),
           ),
           BottomNavigationBarItem(
-            title: Text("Recherche"),
-            icon: Icon(Icons.search),
+            title: Text("Ajouter"),
+            icon: Icon(Icons.add_circle_outline),
           ),
           BottomNavigationBarItem(
             title: Text("Mes favoris"),
@@ -140,7 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
         onTap: (int index) {
           if (index == 1) {
-            runApp(Search());
+            runApp(Ajout());
           }
           if (index == 0) {
             runApp(Liste());
@@ -161,14 +161,11 @@ class BieresList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-      ),
+    return ListView.builder(
       itemCount: bieres.length,
       itemBuilder: (context, index) {
         return ListTile(
-          title: Text(bieres[index].name),
+          title: Text(bieres[index].name + '  |  ' + bieres[index].category),
           onTap: () {
             globals.beerIndex = bieres[index].id;
             globals.nameBeer = bieres[index].name;

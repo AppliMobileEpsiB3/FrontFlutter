@@ -3,7 +3,7 @@ import 'globals.dart' as globals;
 import 'package:lapinte/favoris.dart';
 import 'package:lapinte/liste.dart';
 import 'package:lapinte/main.dart';
-import 'package:lapinte/search.dart';
+import 'package:lapinte/ajouter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -15,9 +15,6 @@ class Detail extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    print(globals.nameBeer.toString());
-    print(globals.isfav.toString());
-
     return MaterialApp(
       title: 'La Pinte',
       theme: ThemeData(
@@ -191,8 +188,8 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: Icon(Icons.list_alt_sharp),
           ),
           BottomNavigationBarItem(
-            title: Text("Recherche"),
-            icon: Icon(Icons.search),
+            title: Text("Ajouter"),
+            icon: Icon(Icons.add_circle_outline),
           ),
           BottomNavigationBarItem(
             title: Text("Mes favoris"),
@@ -208,7 +205,7 @@ class _MyHomePageState extends State<MyHomePage> {
             runApp(Liste());
           }
           if (index == 1) {
-            runApp(Search());
+            runApp(Ajout());
           }
           if (index == 2) {
             runApp(Favoris());
