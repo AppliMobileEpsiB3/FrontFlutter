@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:lapinte/favoris.dart';
 import 'package:lapinte/liste.dart';
 import 'package:flutter/foundation.dart';
-
 import 'package:lapinte/main.dart';
 import 'package:http/http.dart' as http;
 import 'globals.dart' as globals;
@@ -76,7 +75,8 @@ class Biere {
 }
 
 Future<List<Biere>> fetchBeers(http.Client client) async {
-  final response = await client.get('http://10.0.2.2:5000/beers',
+  // final response = await client.get('http://10.0.2.2:5000/beers',
+  final response = await client.get('http://172.16.18.16:5000/beers',
       headers: {"Content-Type": "application/json", "token": globals.token});
 
   // Use the compute function to run parseBieres in a separate isolate.
@@ -100,7 +100,8 @@ class _MyHomePageState extends State<MyHomePage> {
     globals.isHere = false;
 
     bieres.forEach((biere) => {
-          if (biere.name == nomCtrl.text && biere.category == couleurCtrl.text)
+          if (biere.name.toLowerCase() == nomCtrl.text.toLowerCase() &&
+              biere.category.toLowerCase() == couleurCtrl.text.toLowerCase())
             {globals.isHere = true}
         });
     Map data = {
@@ -109,9 +110,10 @@ class _MyHomePageState extends State<MyHomePage> {
       'category': couleurCtrl.text.toString()
     };
 
-    if (globals.isHere) {
+    if (!globals.isHere) {
       String body = json.encode(data);
-      var url = 'http://10.0.2.2:5000/beers';
+      //var url = 'http://10.0.2.2:5000/beers';
+      var url = 'http://172.16.18.16:5000/beers';
       http.Response response = await http.post(
         url,
         headers: {"Content-Type": "application/json", "token": globals.token},
@@ -119,20 +121,6 @@ class _MyHomePageState extends State<MyHomePage> {
       );
     }
   }
-
-  /*Future<String> _isHere(List<Biere> bieres) async {
-    // Récupération de la localisation actuelle de l'utilisateur
-    // Construction de l'URL a appeler
-    var url = 'http://10.0.2.2:5000/beers/';
-    // Appel
-    var response = await http.get(url,
-        headers: {"Content-Type": "application/json", "token": globals.token});
-    //print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
-    globals.isHere = response.body.contains(nomCtrl.text);
-
-    return response.body;
-  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -191,7 +179,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   context: context,
                   builder: (context) {
                     return AlertDialog(
-                      content: Text("Biere ajouter à la liste"),
+                      content: Text("Biere ajoutée à la liste"),
                     );
                   },
                 );
@@ -214,7 +202,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        currentIndex: 0,
+        currentIndex: 1,
         fixedColor: Colors.teal,
         items: [
           BottomNavigationBarItem(

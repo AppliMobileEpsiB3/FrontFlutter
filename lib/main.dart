@@ -61,7 +61,8 @@ class _MyHomePageState extends State<MyHomePage> {
     globals.userName = pseudoCtrlr.text;
     globals.isfav = true;
     String body = json.encode(data);
-    var url = 'http://10.0.2.2:5001/login';
+    //var url = 'http://10.0.2.2:5001/login';
+    var url = 'http://172.16.18.16:5001/login';
     http.Response response = await http.post(
       url,
       headers: {"Content-Type": "application/json"},

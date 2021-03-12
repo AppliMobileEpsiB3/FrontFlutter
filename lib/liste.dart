@@ -9,7 +9,8 @@ import 'package:lapinte/ajouter.dart';
 import 'package:http/http.dart' as http;
 
 Future<List<Biere>> fetchBeers(http.Client client) async {
-  final response = await client.get('http://10.0.2.2:5000/beers',
+  //final response = await client.get('http://10.0.2.2:5000/beers',
+  final response = await client.get('http://172.16.18.16:5000/beers',
       headers: {"Content-Type": "application/json", "token": globals.token});
 
   // Use the compute function to run parseBieres in a separate isolate.
@@ -27,7 +28,8 @@ List<Biere> parseBieres(String responseBody) {
 Future<String> _isInFavoris() async {
   // Récupération de la localisation actuelle de l'utilisateur
   // Construction de l'URL a appeler
-  var url = 'http://10.0.2.2:5000/favorite/' + globals.user_id.toString();
+  //var url = 'http://10.0.2.2:5000/favorite/' + globals.user_id.toString();
+  var url = 'http://172.16.18.16:5000/favorite/' + globals.user_id.toString();
   // Appel
   var response = await http.get(url,
       headers: {"Content-Type": "application/json", "token": globals.token});

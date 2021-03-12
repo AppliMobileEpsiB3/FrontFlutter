@@ -57,18 +57,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  /*Future<String> _ajoutFav() async {
-    // Récupération de la localisation actuelle de l'utilisateur
-    // Construction de l'URL a appeler
-    var url = 'http://10.0.2.2:5000/favorite';
-    // Appel
-    String json = '{"beer_id": 3, "user_id": "2"}';
-    var response = await http.post(url, body: json);
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
-    return response.body;
-  }*/
-
   Future<String> _ajoutFav() async {
     Map data = {
       'beer_id': globals.beerIndex.toString(),
@@ -76,7 +64,8 @@ class _MyHomePageState extends State<MyHomePage> {
     };
 
     String body = json.encode(data);
-    var url = 'http://10.0.2.2:5000/favorite';
+    //var url = 'http://10.0.2.2:5000/favorite';
+    var url = 'http://172.16.18.16:5000/favorite';
     http.Response response = await http.post(
       url,
       headers: {"Content-Type": "application/json", "token": globals.token},
@@ -85,7 +74,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<String> _supFav() async {
-    var url = 'http://10.0.2.2:5000/favorite/' +
+    //var url = 'http://10.0.2.2:5000/favorite/' +
+    var url = 'http://172.16.18.16:5000/favorite/' +
         globals.beerIndex.toString() +
         '/' +
         globals.user_id.toString();
@@ -180,7 +170,6 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: flatButton,
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        currentIndex: 0,
         fixedColor: Colors.teal,
         items: [
           BottomNavigationBarItem(

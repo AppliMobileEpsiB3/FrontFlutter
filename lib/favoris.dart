@@ -11,7 +11,8 @@ import 'globals.dart' as globals;
 
 Future<List<Biere>> fetchBeers(http.Client client) async {
   final response = await client.get(
-      'http://10.0.2.2:5000/favorite/' + globals.user_id.toString(),
+      //'http://10.0.2.2:5000/favorite/' + globals.user_id.toString(),
+      'http://172.16.18.16:5000/favorite/' + globals.user_id.toString(),
       headers: {"Content-Type": "application/json", "token": globals.token});
 
   return compute(parseBieres, response.body);
@@ -118,7 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        currentIndex: 0,
+        currentIndex: 2,
         fixedColor: Colors.teal,
         items: [
           BottomNavigationBarItem(
